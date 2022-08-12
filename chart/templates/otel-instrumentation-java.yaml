@@ -1,0 +1,96 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: humio-sidecar-agent
+  labels:
+    {{- include "otel.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  mode: sidecar
+  image: otel/opentelemetry-collector-contrib:0.56.0
+
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    processors:
+      batch:
+      resourcedetection:
+      resourcedetection/env:
+        detectors: [env]
+        timeout: 2s
+        override: false      
+      # logstransform:
+      #   operators:
+      #   - type: copy
+      #     from: InstrumentationScope
+      #     to: resource.newkey    
+
+    exporters:
+      otlp:
+        endpoint: humio-agent-apphumio-collector-headless:4317
+        tls:
+          insecure: true
+    service:
+      # extensions: [pprof, zpages, health_check]
+      pipelines:
+        metrics:
+          receivers: [otlp]
+          processors: [resourcedetection/env,batch]
+          exporters: [otlp]
+        logs:
+          receivers: [otlp]
+          processors: [resourcedetection/env,batch]
+          exporters: [otlp]
+        traces:
+          receivers: [otlp]
+          processors: [resourcedetection/env,batch]
+          exporters: [otlp]
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: java
+  annotations:
+spec:
+  env:
+    - name: OTEL_TRACES_EXPORTER
+      value: otlp
+    - name: OTEL_METRICS_EXPORTER
+      value: otlp
+    - name: OTEL_LOGS_EXPORTER
+      value: otlp
+    - name: OTEL_EXPORTER_OTLP_ENDPOINT
+      value: http://localhost:4317
+    - name: OTEL_EXPORTER_OTLP_TIMEOUT
+      value: "20"
+    - name: SPLUNK_TRACE_RESPONSE_HEADER_ENABLED
+      value: "true"
+  exporter:
+    endpoint: localhost:4317
+
+  propagators:
+    - tracecontext
+    - baggage
+  sampler:
+    type: parentbased_traceidratio
+    argument: "0.25"
+  java:
+    env:
+      - name: OTEL_JAVAAGENT_DEBUG
+        value: "false"
+      - name: OTEL_INSTRUMENTATION_JDBC_ENABLED
+        value: "false"
+      - name: OTEL_INSTRUMENTATION_RUNTIME_METRICS_ENABLED
+        value: "true"
+      - name: OTEL_INSTRUMENTATION_LOG4J_CONTEXT_DATA_ENABLED
+        value: "true"
+      - name: OTEL_INSTRUMENTATION_LOG4J_APPENDER_ENABLED
+        value: "true"
+      - name: OTEL_INSTRUMENTATION_OSHIENABLED
+        value: "true"

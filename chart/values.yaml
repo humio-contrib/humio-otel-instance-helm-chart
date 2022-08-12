@@ -1,4 +1,4 @@
-# Default values for container-release-with-help-demo.
+# Default values for otel.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -14,6 +14,8 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+humioservice: "http://humio-humio-cluster:8080/services/collector"
+humiosecretprefix: "humio-humio-cluster"
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
