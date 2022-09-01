@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   otel:
   - apiVersion: v2
+    appVersion: 1.0.6
+    created: "2022-09-01T17:53:03.19770865Z"
+    description: A Helm chart for Kubernetes
+    digest: fad21c9cf705559f073b29ead2dd73648ab57717aa4a91394c8938ea83fb00b7
+    name: otel
+    type: application
+    urls:
+    - https://github.com/humio-contrib/humio-otel-instance-helm-chart/releases/download/v1.0.6/otel-1.0.6.tgz
+    version: 1.0.6
+  - apiVersion: v2
     appVersion: 1.0.5
     created: "2022-09-01T17:19:19.114817841Z"
     description: A Helm chart for Kubernetes
@@ -61,4 +71,4 @@ entries:
     urls:
     - https://github.com/ryanfaircloth/humio-otel-instance-helm-chart/releases/download/v1.0.0/otel-1.0.0.tgz
     version: 1.0.0
-generated: "2022-09-01T17:19:19.113775434Z"
+generated: "2022-09-01T17:53:03.196950556Z"
