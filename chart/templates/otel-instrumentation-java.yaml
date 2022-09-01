@@ -66,13 +66,13 @@ spec:
     - name: OTEL_LOGS_EXPORTER
       value: otlp
     - name: OTEL_EXPORTER_OTLP_ENDPOINT
-      value: http://localhost:4318
+      value: http://127.0.0.1:4317
     - name: OTEL_EXPORTER_OTLP_TIMEOUT
       value: "20"
     - name: SPLUNK_TRACE_RESPONSE_HEADER_ENABLED
       value: "true"
   exporter:
-    endpoint: localhost:4317
+    endpoint: 127.0.0.1:4317
 
   propagators:
     - tracecontext
