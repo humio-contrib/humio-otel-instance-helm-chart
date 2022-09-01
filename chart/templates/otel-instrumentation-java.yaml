@@ -1,56 +1,56 @@
-apiVersion: opentelemetry.io/v1alpha1
-kind: OpenTelemetryCollector
-metadata:
-  name: humio-sidecar-agent
-  labels:
-    {{- include "otel.labels" . | nindent 4 }}
-  {{- with .Values.serviceAccount.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-spec:
-  mode: sidecar
-  image: otel/opentelemetry-collector-contrib:0.56.0
+# apiVersion: opentelemetry.io/v1alpha1
+# kind: OpenTelemetryCollector
+# metadata:
+#   name: humio-sidecar-agent
+#   labels:
+#     {{- include "otel.labels" . | nindent 4 }}
+#   {{- with .Values.serviceAccount.annotations }}
+#   annotations:
+#     {{- toYaml . | nindent 4 }}
+#   {{- end }}
+# spec:
+#   mode: sidecar
+#   image: otel/opentelemetry-collector-contrib:0.56.0
 
-  config: |
-    receivers:
-      otlp:
-        protocols:
-          grpc:
-          http:
-    processors:
-      batch:
-      resourcedetection:
-      resourcedetection/env:
-        detectors: [env]
-        timeout: 2s
-        override: false      
-      # logstransform:
-      #   operators:
-      #   - type: copy
-      #     from: InstrumentationScope
-      #     to: resource.newkey    
+#   config: |
+#     receivers:
+#       otlp:
+#         protocols:
+#           grpc:
+#           http:
+#     processors:
+#       batch:
+#       resourcedetection:
+#       resourcedetection/env:
+#         detectors: [env]
+#         timeout: 2s
+#         override: false      
+#       # logstransform:
+#       #   operators:
+#       #   - type: copy
+#       #     from: InstrumentationScope
+#       #     to: resource.newkey    
 
-    exporters:
-      otlp:
-        endpoint: humio-agent-apphumio-collector:4317
-        tls:
-          insecure: true
-    service:
-      # extensions: [pprof, zpages, health_check]
-      pipelines:
-        metrics:
-          receivers: [otlp]
-          processors: [resourcedetection/env,batch]
-          exporters: [otlp]
-        logs:
-          receivers: [otlp]
-          processors: [resourcedetection/env,batch]
-          exporters: [otlp]
-        traces:
-          receivers: [otlp]
-          processors: [resourcedetection/env,batch]
-          exporters: [otlp]
+#     exporters:
+#       otlp:
+#         endpoint: humio-agent-apphumio-collector:4317
+#         tls:
+#           insecure: true
+#     service:
+#       # extensions: [pprof, zpages, health_check]
+#       pipelines:
+#         metrics:
+#           receivers: [otlp]
+#           processors: [resourcedetection/env,batch]
+#           exporters: [otlp]
+#         logs:
+#           receivers: [otlp]
+#           processors: [resourcedetection/env,batch]
+#           exporters: [otlp]
+#         traces:
+#           receivers: [otlp]
+#           processors: [resourcedetection/env,batch]
+#           exporters: [otlp]
 ---
 apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
@@ -66,13 +66,13 @@ spec:
     - name: OTEL_LOGS_EXPORTER
       value: otlp
     - name: OTEL_EXPORTER_OTLP_ENDPOINT
-      value: http://127.0.0.1:4317
+      value: http://humio-agent-apphumio-collector:4317
     - name: OTEL_EXPORTER_OTLP_TIMEOUT
       value: "20"
     - name: SPLUNK_TRACE_RESPONSE_HEADER_ENABLED
       value: "true"
   exporter:
-    endpoint: 127.0.0.1:4317
+    endpoint: humio-agent-apphumio-collector:4317
 
   propagators:
     - tracecontext
