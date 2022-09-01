@@ -33,7 +33,7 @@ spec:
 
     exporters:
       otlp:
-        endpoint: humio-agent-apphumio-collector-headless:4317
+        endpoint: humio-agent-apphumio-collector:4317
         tls:
           insecure: true
     service:
